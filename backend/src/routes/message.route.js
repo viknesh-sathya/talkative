@@ -1,0 +1,7 @@
+import express from "express";
+import messageController from "../controllers/message.controller.js";
+const router = express.Router();
+
+router.get("/send", messageController.send);
+
+export default router;
