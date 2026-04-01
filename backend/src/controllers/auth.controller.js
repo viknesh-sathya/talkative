@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generateToken } from "../lib/utils.js";
 import { sendWelcomeEmail } from "../emails/emailHandlers.js";
+import cloudinary from "../lib/cloudinary.js";
 
-export const signup = async (req, res) => {
+const signup = async (req, res) => {
   try {
     // Trim and normalize input
     const fullName = req.body.fullName?.trim();
@@ -91,7 +92,7 @@ const login = async (req, res) => {
     const password = req.body.password?.trim();
 
     // 1. Basic validations
-    if (!fullName || !email || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         status: "fail",
         message: "All fields are required",
@@ -132,6 +133,7 @@ const login = async (req, res) => {
     res.status(500).json({ status: "error", message: "Internal server error" });
   }
 };
+
 const logout = (_, res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
@@ -143,5 +145,66 @@ const logout = (_, res) => {
     .json({ status: "success", message: "Logged out successfully" });
 };
 
-const authController = { signup, login, logout };
+const check = (req, res) => {
+  const user = req.user; // from protect middleware
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+      },
+    },
+  });
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+
+    if (!profilePic) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Profile picture is required",
+      });
+    }
+
+    const userId = req.user._id; // coming from protect middleware
+
+    // Upload to Cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+      folder: "talketive/profile_pics",
+      resource_type: "image",
+    });
+
+    // Update user document
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "failed",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: { user: updatedUser },
+    });
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Server error while updating profile",
+    });
+  }
+};
+
+const authController = { signup, login, logout, check, updateProfile };
 export default authController;
