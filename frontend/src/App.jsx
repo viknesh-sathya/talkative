@@ -14,7 +14,7 @@ const App = () => {
   console.log("AuthUser:", authUser, isCheckingAuth);
   if (isCheckingAuth) return <PageLoader />;
   return (
-    <div className="min-h-screen bg-slate-900 relative flex items-center justify-center p-4 overflow-hidden">
+    <div className="h-screen bg-slate-900 relative flex items-center justify-center p-4 overflow-hidden">
       {/* Decorators */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]" />
       <div
