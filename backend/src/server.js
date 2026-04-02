@@ -7,8 +7,16 @@ import morgan from "morgan";
 import authRouter from "./routes/auth.route.js";
 import messageRouter from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
+import cors from "cors";
 
 const app = express();
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  }),
+);
+
 const __dirname = path.resolve();
 console.log(process.env.NODE_ENV);
 
