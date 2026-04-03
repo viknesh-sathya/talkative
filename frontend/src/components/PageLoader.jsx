@@ -1,7 +1,7 @@
 // PageLoader.jsx
 export default function PageLoader() {
   return (
-    <div className="flex items-center justify-center h-screen bg-slate-900">
+    <div className="flex items-center justify-center h-screen bg-transparent">
       <div className="flex space-x-2">
         <div
           className="w-2 h-12 bg-blue-500 animate-bounce"

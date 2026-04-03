@@ -9,7 +9,7 @@ import messageRouter from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import cors from "cors";
 
-const app = express();
+const app = express({ limit: "15mb" });
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

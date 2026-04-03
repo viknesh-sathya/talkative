@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-
+import { useAuthStore } from "../store/useAuthStore";
 export const useChatStore = create((set, get) => ({
   allContacts: [],
   chats: [],
@@ -25,22 +25,63 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/contacts");
-      set({ allContacts: res.data.data.users });
+      set({ allContacts: res?.data?.data?.users });
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err?.response?.data?.message);
     } finally {
       set({ isUsersLoading: false });
     }
   },
+
   getMyChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/chats");
-      set({ chats: res.data.data.chatPartners });
+      set({ chats: res?.data?.data?.chatPartners });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       set({ isUsersLoading: false });
+    }
+  },
+
+  getMessagesByUserId: async (userId) => {
+    set({ isMessagesLoading: true });
+    try {
+      const res = await axiosInstance.get(`/messages/${userId}`);
+      set({ messages: res.data.data.messages });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Fetching messages failed");
+    } finally {
+      set({ isMessagesLoading: false });
+    }
+  },
+
+  sendMessage: async (messageData) => {
+    const { selectedUser, messages } = get();
+    //Optimistic Rendering
+    //get form authstore
+    const { authUser } = useAuthStore.getState();
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      _id: tempId,
+      senderId: authUser?._id,
+      receiverId: selectedUser?._id,
+      text: messageData?.text,
+      image: messageData?.image,
+      createdAt: new Date().toDateString(),
+      isOptimistic: true, // optional: flag to identity optimistic
+    };
+    set({ messages: [...messages, optimisticMessage] });
+    try {
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        messageData,
+      );
+      set({ messages: messages.concat(res.data.data.message) });
+    } catch (err) {
+      set({ messages }); // remove the optimistic mesage on failure
+      toast.error(err?.response?.data?.message || "Error sending message");
     }
   },
 }));
