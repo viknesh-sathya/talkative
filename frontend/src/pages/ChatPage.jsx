@@ -14,7 +14,7 @@ function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="relative w-full max-w-6xl h-[90%]">
+    <div className="relative w-full max-w-6xl h-[90%] m-4">
       {/* Mobile Toggle Button */}
       <button
         className="lg:hidden absolute top-4 left-4 z-50 text-cyan-500"
@@ -27,10 +27,11 @@ function ChatPage() {
         {/* LEFT SIDE */}
         <div
           className={`
-            w-80 bg-slate-800 backdrop-blur-sm flex flex-col h-full z-40
-            absolute pt-8 lg:pt-0 lg:relative transition-transform duration-300
-            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          `}
+    w-80 bg-slate-800 backdrop-blur-sm flex-col h-full z-40
+    absolute pt-8 lg:pt-0 lg:relative transition-transform duration-300
+    ${isSidebarOpen ? "translate-x-0 opacity-100 pointer-events-auto" : "-translate-x-full opacity-0 pointer-events-none"}
+    lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto lg:flex
+  `}
         >
           <ProfileHeader />
           <ActiveTabSwitch />
