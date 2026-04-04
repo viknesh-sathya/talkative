@@ -8,16 +8,36 @@ import MessageInput from "./MessageInput";
 import getDateLabel from "../utils/getDateLable";
 
 const ChatContainer = () => {
-  const { messages, getMessagesByUserId, isMessagesLoading, selectedUser } =
-    useChatStore();
+  const {
+    messages,
+    getMessagesByUserId,
+    isMessagesLoading,
+    selectedUser,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
+
   const { authUser } = useAuthStore();
+
   const bottomRef = useRef(null);
+
   useEffect(() => {
     getMessagesByUserId(selectedUser?._id);
-  }, [getMessagesByUserId, selectedUser]);
+    subscribeToMessages();
+
+    //clean up
+    return () => unsubscribeFromMessages();
+  }, [
+    getMessagesByUserId,
+    selectedUser,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
   return (
     <>
       <ChatHeader />

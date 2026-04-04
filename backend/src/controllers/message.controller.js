@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
@@ -105,7 +106,10 @@ const sendMessage = async (req, res) => {
     });
 
     // TODO: send message in real-time if user is online (SOCKET IO)
-
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage); // this to() will send the event only to this user not to everyone
+    }
     res.status(201).json({
       status: "success",
       data: { message: newMessage },

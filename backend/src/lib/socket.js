@@ -20,6 +20,10 @@ const io = new Server(server, {
 // This ensures every socket must pass through your JWT check
 io.use(socketAuthMiddleware);
 
+// 🚨we will use this function to check if the user is online or not
+export function getReceiverSocketId(userId) {
+  return userSocketMap[userId]; // this will give the socketID
+}
 // Store online users in memory
 // Structure: { userId: [socketId1, socketId2, ...] }
 // Using arrays allows multiple tabs/devices per user
