@@ -4,7 +4,7 @@ import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
 import { useAuthStore } from "../store/useAuthStore";
 
-const ChatsList = () => {
+const ChatsList = ({ setIsSidebarOpen }) => {
   const { getMyChatPartners, setSelectedUser, isUsersLoading, chats } =
     useChatStore();
   const { onlineUsers } = useAuthStore();
@@ -23,7 +23,10 @@ const ChatsList = () => {
         <div
           key={chat._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
-          onClick={() => setSelectedUser(chat)}
+          onClick={() => {
+            setSelectedUser(chat);
+            setIsSidebarOpen(false);
+          }}
         >
           <div className="flex items-center gap-3">
             <div
